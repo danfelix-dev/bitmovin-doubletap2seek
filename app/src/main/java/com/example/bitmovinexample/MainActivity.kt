@@ -4,17 +4,11 @@ import android.annotation.SuppressLint
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.GestureDetector
-import com.google.android.material.snackbar.Snackbar
-import androidx.appcompat.app.AppCompatActivity
-import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.navigateUp
-import androidx.navigation.ui.setupActionBarWithNavController
-import android.view.Menu
-import android.view.MenuItem
 import android.view.MotionEvent
 import android.view.View
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GestureDetectorCompat
 import com.bitmovin.player.api.Player
 import com.bitmovin.player.api.source.SourceConfig
@@ -82,17 +76,24 @@ class MainActivity : AppCompatActivity() {
         val detector = GestureDetectorCompat(this, listener)
 
         binding.controlsLayout.setOnTouchListener(object : View.OnTouchListener {
-            override fun onTouch(p0: View?, p1: MotionEvent?): Boolean {
-                p1?.let {
-                    return detector.onTouchEvent(it)
+            override fun onTouch(view: View?, event: MotionEvent?): Boolean {
+                if (event != null) {
+                    if (view != null) {
+                        Log.d("MainActivity", "${event.y} > ${view.height * 0.2}")
+                        if (event.y > view.height * 0.2) {
+                            return detector.onTouchEvent(event)
+                        }
+                    }
                 }
-                return false
+
+                return binding.playerView.dispatchTouchEvent(event)
             }
         })
     }
 
     fun setupSource() {
-        val sourceItem = SourceConfig.fromUrl("https://bitdash-a.akamaihd.net/content/sintel/sintel.mpd")
+        val sourceItem =
+            SourceConfig.fromUrl("https://bitdash-a.akamaihd.net/content/sintel/sintel.mpd")
         player.load(sourceItem)
     }
 
